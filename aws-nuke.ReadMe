@@ -1,0 +1,138 @@
+## Summary of AWS Nuke:
+    AWS Nuke is an open-source tool developed by Rebaze (formerly part of AWS Labs) that helps delete all or selected AWS resources across accounts and regions. It is powerful and dangerous, hence typically used in:
+
+## Sandbox environments
+
+    Cleaning up billing spikes due to unused resources
+
+    I/CD pipelines for temporary test accounts
+
+## Key Features & Capabilities
+    Feature	                        Description
+    Multi-region support	        Deletes resources from one or more AWS regions
+    Multi-account support	        Works across multiple accounts using roles/profiles
+    Dry-run mode	                Shows what will be deleted before performing actual deletion
+    Filtering	                    Fine-grained control over what to delete or exclude
+    Whitelist support	            Keeps specific resources untouched
+    Resource Type Scoping	        Specify only certain AWS resource types to delete
+    Alias and account block checks	Prevent accidental deletion in production
+    Tag filters	                    Optional tagging filters can help include/exclude resources
+    Report	                        CLI prints a list of matched resources before deletion
+
+## Use Case - Scenario:
+    Your company has an automated sandbox AWS account used by developers for short-term testing. 
+    At the end of each sprint, you'd like to clean it up automatically using AWS Nuke.
+
+## config.yaml
+
+regions:
+  - us-east-1
+  - us-west-2
+
+account-blocklist:
+  - "123456789012"     # Example: Production account - blocked
+  - "aws-nuke-master"  # Named alias
+
+accounts:
+  "sandbox-account":
+    filters:
+      IAMUser:
+        - "developer-temp*"       # Exclude dev temporary IAM users
+      S3Bucket:
+        - "logs-bucket*"          # Keep log buckets
+      CloudWatchLogGroup:
+        - "aws/lambda/*"          # Keep Lambda log groups
+
+    include:
+      - EC2Instance
+      - S3Bucket
+      - IAMUser
+      - CloudWatchLogGroup
+      - EBSVolume
+      - LambdaFunction
+      - VPC
+      - SecurityGroup
+
+    exclude:
+      - CloudFormationStack       # Don’t touch infra created by IaC
+
+  "staging-account":
+    filters:
+      S3Bucket:
+        - "backup-*"
+    include:
+      - S3Bucket
+      - EC2Instance
+    exclude:
+      - IAMUser
+
+
+
+## Configuration Options Explained
+    Key	                    Description
+    regions	                List of regions where resources should be nuked
+    account-blocklist	    Prevents running against protected accounts
+    accounts	            Map of account ID or alias to rules
+    filters	                Define resources to be excluded by name patterns
+    include	                Explicit resource types you want to include in nuking
+    exclude	                Explicit resource types you want to exclude from nuking
+
+    include and exclude are mutually exclusive per resource type. Use one of them.
+
+## Step 1: Dry-Run Mode
+   Run AWS Nuke in dry-run mode to simulate the deletion process and inspect output:
+   aws-nuke -c config.yaml --profile sandbox --no-dry-run=false
+
+## Dry-Run Output Example:
+
+    [Dry-Run] Would delete EC2Instance: i-0123456789abcdef (Name: test-instance)
+    [Dry-Run] Would delete S3Bucket: test-sandbox-bucket
+    [Dry-Run] Would delete IAMUser: developer-temp1
+
+
+## You can redirect this output to a file for review:
+   aws-nuke -c config.yaml --profile sandbox --no-dry-run=false > dry-run-report.txt
+
+## Step 2: Actual Deletion (with Confirmation)
+    Once the dry-run output is validated:
+
+    aws-nuke -c config.yaml --profile sandbox --no-dry-run
+
+    You’ll be prompted for a confirmation string to avoid accidental deletion:
+
+    Do you really want to nuke the account with ID 111122223333 and alias sandbox-account?
+    Enter account alias to continue:
+
+    Only after confirming, the tool will proceed to delete the resources.
+
+## Best Practices
+    Always run with --no-dry-run=false first
+
+    Review output manually or via script
+
+    Use filters and exclude aggressively in production
+
+    Always block production accounts using account-blocklist
+
+    Consider scheduling nukes via CI/CD pipelines (e.g., GitHub Actions, Jenkins)
+
+
+
+## Optional: Run with --no-alias-check
+    To avoid alias confirmation for automation:
+    aws-nuke -c config.yaml --no-alias-check --profile sandbox
+    Only use this in non-production, automated pipelines.
+
+## Reporting
+    You can redirect dry-run logs for auditing:
+    aws-nuke -c config.yaml --no-dry-run=false > dry-run-output.log
+
+Or generate a deletion report in automation:
+    aws-nuke -c config.yaml --no-dry-run=false | tee report.txt
+
+
+#   Phase	            Action
+    Configure	        Create config.yaml with include/exclude/filters
+    Dry-run	            Run aws-nuke -c config.yaml --no-dry-run=false
+    Report	            Review or save dry-run results
+    Nuke/Delete	        Run aws-nuke -c config.yaml --no-dry-run

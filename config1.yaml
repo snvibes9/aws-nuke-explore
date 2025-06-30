@@ -1,0 +1,41 @@
+---
+regions:
+  - "global"       # Includes IAM, CloudFront, etc.
+  - "us-east-1"    # Replace or add regions as needed
+
+blocklist:
+  - "7818111xxx"   # Protects production or management account(s)
+
+bypass-alias-check-accounts:
+  - "682475224788"   # Your account ID
+
+no-default-blocklist: true  # Allow deleting resources with names like "prod", etc.
+
+accounts:
+  "682475224788":
+    filters:
+      IAMUser:
+        - "awsadmin"
+      S3Bucket:
+        - "dont-delete-rrr"      # Keep specific bucket
+      KMSKey:
+        - "alias/aws/*"          # Avoid deleting AWS-managed KMS keys
+
+    resource-types:
+      includes:
+        - "*"   # <--- Wildcard includes ALL supported deletable resources
+
+ 
+# Dry Run 
+
+# aws-nuke run --config config.yaml --no-alias-check --no-dry-run=false
+
+# To export the dry run result in output file
+
+#aws-nuke run --config "C:\tools\cloud-nuke\config.yaml" --no-alias-check --no-dry-run=false | Tee-Object -FilePath "dry-run-output.txt"
+
+
+#To delete 
+
+# aws-nuke run --config "C:\tools\cloud-nuke\config.yaml" --no-alias-check --no-dry-run | Tee-Object -FilePath "nuked-output.txt"
+

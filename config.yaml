@@ -1,0 +1,164 @@
+regions:
+  - "global"         # includes IAM, CloudFront, etc.
+  - "us-east-1"      # additional region for regional resources
+
+blocklist:
+  - "7818111xxx"     # Protects production or management account(s)
+
+bypass-alias-check-accounts:
+  - "682475224788"     # Allows bypassing alias checks for your account
+
+no-default-blocklist: true  # Don't restrict default names (e.g., "prod", "admin")
+
+accounts:
+  "682475224788":
+    resource-types:
+      # Only include these resource types
+      includes:
+        # KMS
+        - KMSKey
+        - KMSAlias
+
+        # S3
+        - S3Bucket
+
+        # SSM
+        - SSMParameter
+
+        # Macie
+        - MacieMember
+
+        # Access Analyzer
+        - AccessAnalyzerAnalyzer
+        - AccessAnalyzerArchiveRule
+
+        # Security services
+        - SecurityHub
+        - GuardDutyDetector
+
+        # Config
+        - ConfigServiceConfigRule
+        - ConfigServiceConfigurationRecorder
+        - ConfigServiceDeliveryChannel
+        - ConfigServiceConformancePack
+
+        # Auto-scaling / launch configurations
+        - EC2AutoScalingGroup
+        - LaunchConfiguration
+
+        # VPC and networking
+        - Vpc
+        - Subnet
+        - InternetGateway
+        - NatGateway
+        - RouteTable
+        - NetworkAcl
+        - VpcEndpoint
+        - SecurityGroup
+        - ElasticIp
+        - TransitGateway
+        - TransitGatewayAttachment
+
+        # Lambda
+        - LambdaFunction
+        - LambdaLayerVersion
+
+        # CloudFormation
+        - CloudFormationStack
+
+        # CloudWatch
+        - CloudWatchLogGroup
+
+        # SNS/SQS
+        - SnsTopic
+        - SqsQueue
+
+        # RDS
+        - DBInstance
+        - DBSubnetGroup
+        - DBSnapshot
+
+        # ECR
+        - EcrRepository
+
+        # ELB/ALB/NLB
+        - ELBv2LoadBalancer
+        - ClassicLoadBalancer
+
+        # Elasticache / Redis
+        - ElastiCacheSubnetGroup
+        - CacheCluster
+        - CacheParameterGroup
+
+        # DynamoDB
+        - DynamoDBTable
+
+        # EFS
+        - EfsFileSystem
+
+        # CloudTrail
+        - CloudTrailTrail
+
+        # Secrets Manager
+        - SecretsManagerSecret
+
+        # ACM Issued Certificates
+        - AcmCertificate
+
+        # Direct Connect
+        - DxConnection
+        - DxGateway
+        - DxHostedTransitVirtualInterface
+
+        # Redshift
+        - RedshiftCluster
+        - RedshiftSubnetGroup
+
+        # Elasticsearch
+        - ElasticsearchDomain
+
+        # Route53
+        - Route53HostedZone
+
+        # Kinesis
+        - KinesisStream
+
+        # Athena Workgroup
+        - AthenaWorkgroup
+
+        # Backup
+        - BackupVault
+        - BackupPlan
+
+        # Glue
+        - GlueJob
+
+        # EMR
+        - EmrCluster
+
+        # Step Functions
+        - StepFunctionStateMachine
+
+        # MQ Broker
+        - MqBroker
+
+        # SageMaker
+        - SageMakerNotebookInstance
+
+        # Egress Only Internet Gateway
+        - EgressOnlyInternetGateway
+
+        # VPN
+        - VpnConnection
+        - VpnGateway
+
+        # ELB Classic/ALB etc already included
+    # End of account definition
+# End of accounts block
+    filters:
+      IAMUser:
+        - "awsadmin"
+      S3Bucket:
+        - "dont-delete-1"
+      KMSKey:
+        - "alias/aws/*"  # Preserve AWS-managed KMS keys
