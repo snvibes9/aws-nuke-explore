@@ -15,11 +15,16 @@ accounts:
   "682475224788":
     filters:
       IAMUser:
-        - "awsadmin"
+        - type: exact
+          property: UserName
+          value: "awsadmin"
+      IAMUserPolicyAttachment:
+        - type: exact
+          value: "awsadmin -> AdministratorAccess"
       S3Bucket:
-        - "dont-delete-rrr"      # Keep specific bucket
-      KMSKey:
-        - "alias/aws/*"          # Avoid deleting AWS-managed KMS keys
+        - type: glob
+          property: Name
+          value: "important-bucket-*"
 
     resource-types:
       includes:
