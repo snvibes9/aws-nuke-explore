@@ -85,7 +85,7 @@ accounts:
 
       # Protect this specific S3 bucket
       S3Bucket:
-        - "dont-delete-1"
+        - "dont-delete-*"
 
       # Do not delete AWS-managed KMS keys
       KMSKey:
