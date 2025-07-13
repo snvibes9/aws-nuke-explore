@@ -1,0 +1,92 @@
+regions:
+  - "global"
+  - "us-east-1"
+
+blocklist:
+  - "7818111xxx"
+
+bypass-alias-check-accounts:
+  - "68247xxxxx"
+
+no-default-blocklist: true
+
+accounts:
+  "68247xxxxx":
+    resource-types:
+      includes:
+        # Use wildcards instead of listing all individually
+        - KMS*
+        - S3*
+        - SSM*
+        - Macie*
+        - AccessAnalyzer*
+        - SecurityHub
+        - GuardDuty*
+        - ConfigService*
+        - EC2*
+        - Vpc*
+        - Subnet
+        - InternetGateway
+        - NatGateway
+        - RouteTable
+        - NetworkAcl
+        - VpcEndpoint
+        - ElasticIp
+        - TransitGateway*
+        - Lambda*
+        - CloudFormation*
+        - CloudWatch*
+        - Sns*
+        - Sqs*
+        - DB*
+        - Ecr*
+        - ELB*
+        - ElastiCache*
+        - DynamoDB*
+        - Efs*
+        - CloudTrail*
+        - SecretsManager*
+        - Acm*
+        - Dx*
+        - Redshift*
+        - Elasticsearch*
+        - Route53*
+        - Kinesis*
+        - Athena*
+        - Backup*
+        - Glue*
+        - Emr*
+        - StepFunction*
+        - Mq*
+        - SageMaker*
+        - EgressOnlyInternetGateway
+        - Vpn*
+
+    filters:
+      # Do not delete IAM user 'awsadmin' or any of its dependencies
+      IAMUser:
+        - "awsadmin"
+      IAMUserPolicy:
+        - "awsadmin"
+      IAMUserPolicyAttachment:
+        - "awsadmin"
+      IAMUserGroupAttachment:
+        - "awsadmin"
+      IAMGroupMembership:
+        - "awsadmin"
+      IAMLoginProfile:
+        - "awsadmin"
+      IAMUserAccessKey:
+        - "awsadmin"
+      IAMUserLoginProfile:
+        - "awsadmin"
+      IAMVirtualMFADevice:
+        - "awsadmin"
+
+      # Protect this specific S3 bucket
+      S3Bucket:
+        - "dont-delete-1"
+
+      # Do not delete AWS-managed KMS keys
+      KMSKey:
+        - "alias/aws/*"
