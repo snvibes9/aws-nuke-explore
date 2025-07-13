@@ -26,16 +26,37 @@ accounts:
         - "*"   # <--- Wildcard includes ALL supported deletable resources
 
  
-# Dry Run 
+Windows:
+ 
+# Dry Run: Show what would be deleted (but don't actually delete)
 
-# aws-nuke run --config config.yaml --no-alias-check --no-dry-run=false
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false
 
-# To export the dry run result in output file
+# Export dry run result to a file (stdout only)
 
-#aws-nuke run --config "C:\tools\cloud-nuke\config.yaml" --no-alias-check --no-dry-run=false | Tee-Object -FilePath "dry-run-output.txt"
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false | Tee-Object -FilePath "dry-run-output.txt"
+
+# Export full dry run output (stdout + stderr) to a file
+
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false *>&1 | Tee-Object -FilePath "dry-run-raw.txt"
 
 
-#To delete 
+#  To actually delete resources (permanent action!)
 
-# aws-nuke run --config "C:\tools\cloud-nuke\config.yaml" --no-alias-check --no-dry-run | Tee-Object -FilePath "nuked-output.txt"
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run *>&1 | Tee-Object -FilePath "nuked-output.txt"
 
+
+
+Linux:
+
+# Dry Run: Show what would be deleted (but don't actually delete)
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false
+
+# Export dry run result to a file (stdout only)
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false | tee dry-run-output.txt
+
+# Export full dry run output (stdout + stderr) to a file
+aws-nuke run -c config.yaml --no-alias-check --no-dry-run=false > >(tee dry-run-raw.txt) 2>&1
+
+#  To actually delete resources (permanent action!)
+ aws-nuke run -c config.yaml --no-alias-check --no-dry-run > >(tee nuked-output.txt) 2>&1
