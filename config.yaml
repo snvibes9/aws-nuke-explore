@@ -8,16 +8,25 @@ blocklist:
 bypass-alias-check-accounts:
   - "682475224788"     # Allows bypassing alias checks for your account
 
-no-default-blocklist: true  # Don't restrict default names (e.g., "prod", "admin")
+no-blocklist-terms-default: true  # Don't restrict default names (e.g., "prod", "admin")
 
 accounts:
   "682475224788":
     resource-types:
+      excludes:
+        - IAMRole
+        - EC2
       # Only include these resource types
       includes:
-        # KMS
         - KMSKey
         - KMSAlias
+        - SSMParameter
+        - Macie
+        - GuardDutyDetector
+        - ConfigServiceConfigRule
+        - ConcifServiceConfigurationRecorde
+        - ConfigServiceConformancePack
+        - ConfigServiceDeliveryChannel
 
         # S3
         - S3Bucket
@@ -151,14 +160,3 @@ accounts:
         # VPN
         - VpnConnection
         - VpnGateway
-
-        # ELB Classic/ALB etc already included
-    # End of account definition
-# End of accounts block
-    filters:
-      IAMUser:
-        - "awsadmin"
-      S3Bucket:
-        - "dont-delete-1"
-      KMSKey:
-        - "alias/aws/*"  # Preserve AWS-managed KMS keys
